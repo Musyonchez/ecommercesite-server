@@ -1,66 +1,65 @@
 import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
-  type Products {
-    id: String
-    name: String
-    description: String
-    minimumQuantity: Float
-    currentQuantity: Float
-    reorderQuantity: Float
-    costCurrent: Float
-    costPrevious: Float
-    active: Boolean
-  }
-
   type Product {
     id: String
     name: String
     description: String
-    minimumQuantity: Float
-    currentQuantity: Float
-    reorderQuantity: Float
-    costCurrent: Float
-    costPrevious: Float
-    active: Boolean
+    price: Float
+    stock: Int
+    category: String
+    manufacturer: String
+    imageUrl: String
+    isActive: Boolean
+  }
+
+  type Order {
+    id: String
+    products: [Product]
+    totalAmount: Float
+    createdAt: String
+    status: String
   }
 
   type Query {
-    products(company: String!, type: String!): [Products]
-    activeProducts(company: String!, type: String!): [Product]
-    inactiveProducts(company: String!, type: String!): [Product]
-    product(id: String!, company: String!, type: String!): Product
+    products: [Product]
+    product(id: String!): Product
+    activeProducts: [Product]
+    inactiveProducts: [Product]
+    orders: [Order]
+    order(id: String!): Order
   }
 
   type Mutation {
     addProduct(
       name: String
       description: String
-      minimumQuantity: Float
-      currentQuantity: Float
-      reorderQuantity: Float
-      costCurrent: Float
-      costPrevious: Float
-      company: String!
-      type: String!
+      price: Float
+      stock: Int
+      category: String
+      manufacturer: String
+      imageUrl: String
+      isActive: Boolean
     ): Product
 
     editProduct(
       id: String!
       name: String
       description: String
-      minimumQuantity: Float
-      currentQuantity: Float
-      reorderQuantity: Float
-      costCurrent: Float
-      costPrevious: Float
-      company: String!
-      type: String!
+      price: Float
+      stock: Int
+      category: String
+      manufacturer: String
+      imageUrl: String
+      isActive: Boolean
     ): Product
 
-    deleteProduct(id: String!, company: String!, type: String!): Product
+    deleteProduct(id: String!): Product
 
-    deactivateProduct(id: String!, company: String!, type: String!): Product
+    deactivateProduct(id: String!): Product
+
+    createOrder(productIds: [String!]): Order
+    cancelOrder(id: String!): Order
   }
 `;
 

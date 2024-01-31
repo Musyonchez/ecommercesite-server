@@ -1,32 +1,36 @@
 import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
-  type Users {
-    id: String
-    firstName: String
-    lastName: String
-    age: Int
-    email: String
-    store1: Boolean
-    store2: Boolean
-    store3: Boolean
-    store4: Boolean
-    role: UserRole
-  }
-
   type User {
     id: String
     firstName: String
     lastName: String
     age: Int
     email: String
-    password: String
-    store1: Boolean
-    store2: Boolean
-    store3: Boolean
-    store4: Boolean
-    company: String
+    phoneNumber: String
+    address: String
+    city: String
+    postalCode: String
+    country: String
+    orders: [Order]
     role: UserRole
+  }
+
+  type Order {
+    id: String
+    products: [Product]
+    totalAmount: Float
+    createdAt: String
+    status: String
+  }
+
+  type Product {
+    id: String
+    name: String
+    description: String
+    price: Float
+    stock: Int
+    imageUrl: String
   }
 
   enum UserRole {
@@ -36,9 +40,13 @@ const typeDefs = gql`
   }
 
   type Query {
-    users(company: String!, type: String!): [Users]
-    user(id: String!, company: String!, type: String!): User
-    authenticateUser(email: String!, password: String!, company: String!): User
+    users: [User]
+    user(id: String!): User
+    authenticateUser(email: String!, password: String!): User
+    orders: [Order]
+    order(id: String!): Order
+    products: [Product]
+    product(id: String!): Product
   }
 
   type Mutation {
@@ -47,14 +55,13 @@ const typeDefs = gql`
       lastName: String
       age: Int
       email: String
+      phoneNumber: String
       password: String
-      store1: Boolean
-      store2: Boolean
-      store3: Boolean
-      store4: Boolean
+      address: String
+      city: String
+      postalCode: String
+      country: String
       role: UserRole
-      company: String
-      type: String
     ): User
 
     editUser(
@@ -64,16 +71,37 @@ const typeDefs = gql`
       age: Int
       email: String
       password: String
-      store1: Boolean
-      store2: Boolean
-      store3: Boolean
-      store4: Boolean
+      phoneNumber: String
+      address: String
+      city: String
+      postalCode: String
+      country: String
       role: UserRole
-      company: String
-      type: String
     ): User
 
-    deleteUser(id: String!, company: String!, type: String!): User
+    deleteUser(id: String!): User
+
+    createOrder(productIds: [String!]): Order
+    cancelOrder(id: String!): Order
+
+    addProduct(
+      name: String
+      description: String
+      price: Float
+      stock: Int
+      imageUrl: String
+    ): Product
+
+    editProduct(
+      id: String!
+      name: String
+      description: String
+      price: Float
+      stock: Int
+      imageUrl: String
+    ): Product
+
+    deleteProduct(id: String!): Product
   }
 `;
 

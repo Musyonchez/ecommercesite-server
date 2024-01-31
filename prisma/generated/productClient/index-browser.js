@@ -104,12 +104,20 @@ exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
-  minimumQuantity: 'minimumQuantity',
-  currentQuantity: 'currentQuantity',
-  reorderQuantity: 'reorderQuantity',
-  costCurrent: 'costCurrent',
-  costPrevious: 'costPrevious',
-  active: 'active'
+  price: 'price',
+  stock: 'stock',
+  category: 'category',
+  manufacturer: 'manufacturer',
+  imageUrl: 'imageUrl',
+  isActive: 'isActive',
+  orderId: 'orderId'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  totalAmount: 'totalAmount',
+  createdAt: 'createdAt',
+  status: 'status'
 };
 
 exports.Prisma.SortOrder = {
@@ -124,7 +132,8 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  Product: 'Product'
+  Product: 'Product',
+  Order: 'Order'
 };
 
 /**

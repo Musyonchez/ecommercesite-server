@@ -11,13 +11,23 @@ datasource productDb {
 }
 
 model Product {
-  id          String @id @default(auto()) @map("_id") @productDb.ObjectId
-  name            String
-  description     String?
-  minimumQuantity Float?
-  currentQuantity Float?
-  reorderQuantity Float?
-  costCurrent     Float?
-  costPrevious    Float?
-  active          Boolean   @default(true)
+  id           String    @id @default(auto()) @map("_id") @productDb.ObjectId
+  name         String
+  description  String?
+  price        Float?
+  stock        Int?      // Represents the quantity in stock
+  category     String?   // Represents the product category
+  manufacturer String?   // Represents the manufacturer of the product
+  imageUrl     String?   // Represents the URL of the product image
+  isActive     Boolean   @default(true)  // Indicates whether the product is active
+  orderId      String?   // New field: Represents the Order ID associated with the product
+  order        Order?    @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+  id           String    @id @default(auto()) @map("_id") @productDb.ObjectId
+  products     Product[]
+  totalAmount  Float
+  createdAt    DateTime   @default(now())
+  status       String
 }

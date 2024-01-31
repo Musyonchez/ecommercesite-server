@@ -103,7 +103,37 @@ Prisma.NullTypes = {
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  phoneNumber: 'phoneNumber'
+  phoneNumber: 'phoneNumber',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  password: 'password',
+  address: 'address',
+  city: 'city',
+  postalCode: 'postalCode',
+  country: 'country'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  totalAmount: 'totalAmount',
+  createdAt: 'createdAt',
+  status: 'status'
+};
+
+exports.Prisma.ProductOrderScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId'
+};
+
+exports.Prisma.ProductScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  price: 'price',
+  stock: 'stock',
+  imageUrl: 'imageUrl'
 };
 
 exports.Prisma.SortOrder = {
@@ -118,7 +148,10 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  Order: 'Order',
+  ProductOrder: 'ProductOrder',
+  Product: 'Product'
 };
 
 /**

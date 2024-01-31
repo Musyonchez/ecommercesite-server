@@ -1,29 +1,14 @@
-import { PrismaClient, UserRole } from "../../prisma/userClient";
-import { getDynamicDatabaseUrl } from "../components/database/GetynamicDatabaseUrl";
+import { PrismaClient } from "../../prisma/generated/userClient";
+
+const prisma = new PrismaClient();
 
 const userResolvers = {
   Query: {
-    users: async (
-      _: any,
-      { company, type }: { company: string; type: string }
-    ) => {
-      const dynamicDatabaseUrl = await getDynamicDatabaseUrl(company, type);
-
-      process.env.STOCKSYNC_USERS = dynamicDatabaseUrl;
-      const prisma = new PrismaClient();
-
+    users: async () => {
       return await prisma.user.findMany();
     },
 
-    user: async (
-      _: any,
-      { id, company, type }: { id: string; company: string; type: string }
-    ) => {
-      const dynamicDatabaseUrl = await getDynamicDatabaseUrl(company, type);
-
-      process.env.STOCKSYNC_USERS = dynamicDatabaseUrl;
-      const prisma = new PrismaClient();
-
+    user: async (_: any, { id }: { id: string }) => {
       return await prisma.user.findUnique({
         where: {
           id,
@@ -31,108 +16,71 @@ const userResolvers = {
       });
     },
 
-    authenticateUser: async (
-      _: any,
-      {
-        email,
-        password,
-        company,
-      }: { email: string; password: string; company: string }
-    ) => {
-      const type = "user";
-      const dynamicDatabaseUrl = await getDynamicDatabaseUrl(company, type);
-
-      process.env.STOCKSYNC_USERS = dynamicDatabaseUrl;
-
-      const prisma = new PrismaClient();
-
-      const user = await prisma.user.findUnique({
-        where: { email },
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          age: true,
-          email: true,
-          password: true,
-          store1: true,
-          store2: true,
-          store3: true,
-          store4: true,
-          company: true,
-          role: true,
-        },
-      });
-
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      const isPasswordValid = user.password === password;
-
-      if (isPasswordValid) {
-        return { ...user, company };
-      } else {
-        throw new Error("Invalid credentials");
-      }
-    },
+    // Uncomment and modify the authenticateUser resolver as needed
+    // authenticateUser: async (_: any, { email, password, company }: { email: string; password: string; company: string }) => {
+    //   // Your implementation here
+    // },
   },
 
   Mutation: {
     addUser: async (
       _: any,
-      args: {
+      {
+        email,
+        phoneNumber,
+        firstName,
+        lastName,
+        password,
+        address,
+        city,
+        postalCode,
+        country,
+      }: {
+        email: string;
+        phoneNumber: string;
         firstName: string;
         lastName: string;
-        age: number;
-        email: string;
         password: string;
-        store1: boolean;
-        store2: boolean;
-        store3: boolean;
-        store4: boolean;
-        role: UserRole;
-        company: string;
-        type: string;
+        address: string;
+        city: string;
+        postalCode: string;
+        country: string;
       }
     ) => {
-      const { company, type, ...productData } = args;
+      try {
+        const newUser = await prisma.user.create({
+          data: {
+            email,
+            phoneNumber,
+            firstName,
+            lastName,
+            password,
+            address,
+            city,
+            postalCode,
+            country,
+          },
+        });
 
-      const dynamicDatabaseUrl = await getDynamicDatabaseUrl(company, type);
-
-      process.env.STOCKSYNC_USERS = dynamicDatabaseUrl;
-
-      const prisma = new PrismaClient();
-
-      return await prisma.user.create({ data: productData });
+        return newUser;
+      } catch (error) {
+        console.error("Error adding user:", error);
+        throw new Error("Failed to add user");
+      }
     },
 
     editUser: async (
       _: any,
       args: {
         id: string;
+        email?: string;
+        phoneNumber?: string;
         firstName?: string;
         lastName?: string;
-        age?: number;
-        email?: string;
         password?: string;
-        store1?: boolean;
-        store2?: boolean;
-        store3?: boolean;
-        store4?: boolean;
-        role?: UserRole;
-        company: string;
-        type: string;
+        address?: string;
       }
     ) => {
-      const { company, type } = args;
-
-      const dynamicDatabaseUrl = await getDynamicDatabaseUrl(company, type);
-
-      process.env.STOCKSYNC_USERS = dynamicDatabaseUrl;
-
-      const prisma = new PrismaClient();
-
       try {
         const existingUser = await prisma.user.findUnique({
           where: {
@@ -147,16 +95,12 @@ const userResolvers = {
         const updatedUser = await prisma.user.update({
           where: { id: args.id },
           data: {
+            email: args.email ?? existingUser.email,
+            phoneNumber: args.phoneNumber ?? existingUser.phoneNumber,
             firstName: args.firstName ?? existingUser.firstName,
             lastName: args.lastName ?? existingUser.lastName,
-            age: args.age ?? existingUser.age,
-            email: args.email ?? existingUser.email,
             password: args.password ?? existingUser.password,
-            store1: args.store1 ?? existingUser.store1,
-            store2: args.store2 ?? existingUser.store2,
-            store3: args.store3 ?? existingUser.store3,
-            store4: args.store4 ?? existingUser.store4,
-            role: args.role ?? existingUser.role,
+            address: args.address ?? existingUser.address,
           },
         });
 
@@ -166,16 +110,7 @@ const userResolvers = {
       }
     },
 
-    deleteUser: async (
-      _: any,
-      { id, company, type }: { id: string; company: string; type: string }
-    ) => {
-      const dynamicDatabaseUrl = await getDynamicDatabaseUrl(company, type);
-
-      process.env.STOCKSYNC_USERS = dynamicDatabaseUrl;
-
-      const prisma = new PrismaClient();
-
+    deleteUser: async (_: any, { id }: { id: string }) => {
       try {
         const currentUser = await prisma.user.findUnique({
           where: { id },

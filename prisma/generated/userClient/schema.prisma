@@ -11,7 +11,44 @@ datasource userDb {
 }
 
 model User {
-  id          String @id @default(auto()) @map("_id") @userDb.ObjectId
-  email       String
-  phoneNumber String @default("000-000-0000")
+  id           String   @id @default(auto()) @map("_id") @userDb.ObjectId
+  email        String
+  phoneNumber  String   @default("000-000-0000")
+  firstName    String
+  lastName     String
+  password     String   // Consider using a secure way to store passwords, like hashing
+  address      String
+  city         String
+  postalCode   String
+  country      String
+  orders       Order[]
 }
+
+model Order {
+  id           String   @id @default(auto()) @map("_id") @userDb.ObjectId
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  products     ProductOrder[]
+  totalAmount  Float
+  createdAt    DateTime  @default(now())
+  status       String
+}
+
+model ProductOrder {
+  id           String   @id @default(auto()) @map("_id") @userDb.ObjectId
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id])
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+}
+
+model Product {
+  id           String   @id @default(auto()) @map("_id") @userDb.ObjectId
+  name         String
+  description  String?
+  price        Float?
+  stock        Int?
+  imageUrl     String?
+  orders       ProductOrder[]
+}
+
