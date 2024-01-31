@@ -1,0 +1,23 @@
+// productSchema.prisma
+generator storeClient {
+  provider = "prisma-client-js"
+  output   = "./generated/productClient"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "rhel-openssl-1.0.x"]
+}
+
+datasource productDb {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+model Product {
+  id          String @id @default(auto()) @map("_id") @productDb.ObjectId
+  name            String
+  description     String?
+  minimumQuantity Float?
+  currentQuantity Float?
+  reorderQuantity Float?
+  costCurrent     Float?
+  costPrevious    Float?
+  active          Boolean   @default(true)
+}
