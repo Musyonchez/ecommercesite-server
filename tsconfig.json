@@ -31,11 +31,16 @@
 		"downlevelIteration": true,
 		"declaration": true,
 
-		"pretty": true
+		"pretty": true,
+
+		"typeRoots": ["./node_modules/@types", "./types"],
+		"types": ["b2"]
+
 	},
 	"include": [
 		"typings/**/*",
 		"src/**/*",
-		 "src/server.ts"],
+		"src/server.ts"
+	],
 	"exclude": ["node_modules"]
-	}
+}

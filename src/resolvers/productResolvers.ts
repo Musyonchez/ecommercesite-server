@@ -1,5 +1,11 @@
 import { PrismaClient } from "../../prisma/generated/productClient";
 
+import { createB2Service } from '../services/b2Service';  // Import the B2Service
+
+const b2Service = createB2Service('B2_KEY_ID', 'B2_APPLICATION_KEY');
+
+
+
 const prisma = new PrismaClient();
 
 const productResolvers = {
@@ -17,8 +23,30 @@ const productResolvers = {
   },
 
   Mutation: {
-    addProduct: async (_: any, args: any) =>
-      await prisma.product.create({ data: args }),
+    addProduct: async (_: any, args: any) => {
+      try {
+        // Extract image file from args
+        const { imageFile, ...productData } = args;
+
+        // Upload image to Backblaze B2
+        const b2UploadResponse = await b2Service.uploadFile('stocksync', 'shopify/' + imageFile.filename, imageFile.createReadStream(), imageFile.mimetype);
+
+        // Now use the obtained B2 URL as imageUrl in product creation
+        const newProduct = await prisma.product.create({
+          data: {
+            ...productData,
+            imageUrl: b2UploadResponse.url,
+          },
+        });
+
+        return newProduct;
+      } catch (error) {
+        console.error('Error adding product:', error);
+        throw new Error('Failed to add product');
+      }
+    },
+
+
     editProduct: async (_: any, args: any) => {
       try {
         const existingProduct = await prisma.product.findUnique({
